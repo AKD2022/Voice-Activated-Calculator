@@ -1,17 +1,30 @@
-from tkinter import *
+import os 
+import pyaudio
+import playsound
+from gtts import gTTS
+import speech_recognition as sr
 
-root=Tk()
-root.title('Smart Calculator')
-root.config(bg='blue')
-root.geometry('680x486+100+100')
 
-entryField=Entry(root,font=('arial', 20, 'bold'), bg='blue', fg='white', bd=10, relief=SUNKEN, width=30)
-entryField.grid(row=0, column=0)
+def rec():
+    r = sr.Recognizer()
+    with sr.Microphone(device_index=0) as source:
 
-button_text_list = ["C", "CE", "√"]
+        try:
+            audio = r.listen(source)
+            said = ""
+            said = r.recognize_google(audio)
+            print(said)
+        except Exception:
+            print("No Audio Recorded, try again.")
+    return said
 
-button = Button(root, width=5, height=2, bd=2, relief=SUNKEN, text=i, bg='blue', fg='white', 
-                font=('arial', 18, 'bold'), activebackground='blue')
-button.grid(row=1, column=0)
+def solve_problem():
+    solve_problem = rec()
 
-root.mainloop()
+    result = eval(solve_problem)
+    print(result)
+    
+
+while True:
+    rec()
+    solve_problem()
