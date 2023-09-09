@@ -4,7 +4,6 @@ import math
 from gtts import gTTS
 import speech_recognition as sr
 import sympy as sp
-from word2number import w2n
 
 def rec():
     r = sr.Recognizer()
@@ -30,20 +29,39 @@ def extract_math_expression(user_input):
     else:
         return user_input
 
+def process_math_input(user_input):
+    # Replace common words with their mathematical symbols or functions
+    user_input = user_input.replace("pi", str(math.pi))
+    user_input = user_input.replace("plus", "+")
+    user_input = user_input.replace("minus", "-")
+    user_input = user_input.replace("times", "*")
+    user_input = user_input.replace("divided by", "/")
+    user_input = user_input.replace("th", " ")
+    user_input = user_input.replace("nd", " ")
+    user_input = user_input.replace("st", " ")
+
+    # Handle square roots
+    # user_input = re.sub(r'square root of (\d+)', r'sqrt(\1)', user_input, flags=re.IGNORECASE)
+
+    # Convert words like "million" and "billion" to numbers
+    number_words = {
+        'million': 1e6,
+        'millions': 1e6,
+        'billion': 1e9,
+        'billions': 1e9,
+    }
+    for word, number in number_words.items():
+        user_input = user_input.replace(word, str(number))
+
+    return user_input
+
 def solve_problem(user_input):
     try:
-        # Replace common words with their mathematical symbols or functions
-        user_input = user_input.replace("pi", str(math.pi))
-        user_input = user_input.replace("plus", "+")
-        user_input = user_input.replace("minus", "-")
-        user_input = user_input.replace("times", "*")
-        user_input = user_input.replace("divided by", "/")
-        
-        # Handle square roots
-        user_input = user_input.replace("square root", "sqrt")
-        
-        # Use sympy to evaluate the user's input as a symbolic expression
-        expr = sp.sympify(user_input)
+        # Process the user's input
+        processed_input = process_math_input(user_input)
+
+        # Use sympy to evaluate the processed input as a symbolic expression
+        expr = sp.sympify(processed_input)
         result = sp.simplify(expr)
         print(result)
         return result
@@ -55,7 +73,7 @@ def answerAudio(user_input):
     language = 'en'
     math_expression = extract_math_expression(user_input)
     result = solve_problem(math_expression)
-    
+
     if result is not None:
         response = gTTS(text=f"The result is {result}", lang=language, slow=False)
         response.save("answer.wav")
@@ -63,7 +81,6 @@ def answerAudio(user_input):
 
 while True:
     user_input = rec()
-    if user_input == "end program":
-        os.remove("answer.wav")
+    if user_input == "end program" or user_input == "im done":
         break
     answerAudio(user_input)
