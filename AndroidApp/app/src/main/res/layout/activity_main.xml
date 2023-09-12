@@ -169,7 +169,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:textSize="25sp"
-                android:id="@+id/btnDecimal"
+                android:id="@+id/btnDot"
                 android:text="."
                 android:textColor="@android:color/white"
                 android:background="@android:color/transparent"/>
